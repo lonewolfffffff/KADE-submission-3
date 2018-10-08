@@ -18,17 +18,8 @@ class MainActivity : AppCompatActivity(), MatchListFragment.OnFragmentInteractio
         setContentView(R.layout.activity_main)
 
         navMatch.setOnNavigationItemSelectedListener(BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigate_prev_match -> {
-                    replaceFragment(MatchListFragment.newInstance(true), framelayout.id)
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigate_next_match -> {
-                    replaceFragment(MatchListFragment.newInstance(isPrevMatch = false), framelayout.id)
-                    return@OnNavigationItemSelectedListener true
-                }
-            }
-            return@OnNavigationItemSelectedListener false
+            replaceFragment(MatchListFragment.newInstance(item.itemId), framelayout.id)
+            return@OnNavigationItemSelectedListener true
         })
 
         addFragment(MatchListFragment(), framelayout.id)
@@ -36,9 +27,9 @@ class MainActivity : AppCompatActivity(), MatchListFragment.OnFragmentInteractio
 
     override fun onMatchListItemClick(match: Event) {
         startActivity<DetailActivity>(
-                "MATCH_ID" to match.eventId,
-                "HOME_TEAM_ID" to match.homeTeamId,
-                "AWAY_TEAM_ID" to match.awayTeamId
+                getString(R.string.intent_match_id) to match.eventId,
+                getString(R.string.intent_home_team_id) to match.homeTeamId,
+                getString(R.string.intent_away_team_id) to match.awayTeamId
         )
 
     }

@@ -10,6 +10,9 @@ data class EventDetail (
     var eventDate: String? = null,
 
     // Home
+    @SerializedName("idHomeTeam")
+    var homeTeamId: String? = null,
+
     @SerializedName("strHomeTeam")
     var homeTeam: String? = null,
 
@@ -41,6 +44,9 @@ data class EventDetail (
     var homeSubstitutes: String? = null,
 
     // Away
+    @SerializedName("idAwayTeam")
+    var awayTeamId: String? = null,
+
     @SerializedName("strAwayTeam")
     var awayTeam: String? = null,
 

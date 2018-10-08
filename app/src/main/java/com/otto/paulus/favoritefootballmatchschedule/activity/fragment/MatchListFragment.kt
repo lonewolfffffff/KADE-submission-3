@@ -13,19 +13,23 @@ import com.google.gson.Gson
 import com.otto.paulus.favoritefootballmatchschedule.R
 import com.otto.paulus.favoritefootballmatchschedule.adapter.MatchListAdapter
 import com.otto.paulus.favoritefootballmatchschedule.api.ApiRepository
+import com.otto.paulus.favoritefootballmatchschedule.db.FavoriteMatch
+import com.otto.paulus.favoritefootballmatchschedule.db.database
 import com.otto.paulus.favoritefootballmatchschedule.model.Event
 import com.otto.paulus.favoritefootballmatchschedule.presenter.MatchListPresenter
 import com.otto.paulus.favoritefootballmatchschedule.util.*
 import com.otto.paulus.favoritefootballmatchschedule.view.MatchListView
 import org.jetbrains.anko.AnkoLogger
+import org.jetbrains.anko.db.classParser
+import org.jetbrains.anko.db.select
 import org.jetbrains.anko.support.v4.onRefresh
 
-private const val ARG_LIST_PREV_MATCH = "prevMatch"
+private const val ARG_LIST_TYPE = "listType"
 
 class MatchListFragment : Fragment(),MatchListView, AnkoLogger {
     private val leagueId:Int = 4328
 
-    private var isPrevMatch: Boolean = true
+    private var listType:Int = R.id.navigate_prev_match
     private var listener: OnFragmentInteractionListener? = null
 
     private var events: MutableList<Event> = mutableListOf()
@@ -40,7 +44,7 @@ class MatchListFragment : Fragment(),MatchListView, AnkoLogger {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            isPrevMatch = it.getBoolean(ARG_LIST_PREV_MATCH)
+            listType = it.getInt(ARG_LIST_TYPE)
         }
         presenter = MatchListPresenter(this, ApiRepository(), Gson())
     }
@@ -66,11 +70,24 @@ class MatchListFragment : Fragment(),MatchListView, AnkoLogger {
     }
 
     private fun getEventsList() {
-        if(isPrevMatch) {
-            presenter.getLast15EventsList(leagueId)
-        }
-        else {
-            presenter.getNext15EventsList(leagueId)
+        when(listType) {
+            R.id.navigate_prev_match -> {
+                presenter.getLast15EventsList(leagueId)
+            }
+            R.id.navigate_next_match -> {
+                presenter.getNext15EventsList(leagueId)
+            }
+            R.id.navigate_favorites -> {
+                context?.database?.use {
+                    val result = select(FavoriteMatch.TABLE_FAVORITE_MATCH)
+                    val favorite = result.parseList(classParser<FavoriteMatch>())
+                    val favoriteEvents = favorite.map{
+                        it -> Event(it.matchId,it.matchDate,it.homeTeamName,it.homeTeamId,it.homeScore,it.awayTeamName,it.awayTeamId,it.awayScore)
+                    }
+                    hideLoading()
+                    showEventList(favoriteEvents)
+                }
+            }
         }
     }
 
@@ -114,10 +131,10 @@ class MatchListFragment : Fragment(),MatchListView, AnkoLogger {
 
     companion object {
         @JvmStatic
-        fun newInstance(isPrevMatch: Boolean) =
+        fun newInstance(listType: Int) =
                 MatchListFragment().apply {
                     arguments = Bundle().apply {
-                        putBoolean(ARG_LIST_PREV_MATCH, isPrevMatch)
+                        putInt(ARG_LIST_TYPE, listType)
                     }
                 }
     }

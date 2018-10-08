@@ -1,10 +1,12 @@
 package com.otto.paulus.favoritefootballmatchschedule.presenter
 
+import android.content.Context
 import com.google.gson.Gson
 import com.otto.paulus.favoritefootballmatchschedule.api.ApiRepository
 import com.otto.paulus.favoritefootballmatchschedule.api.TheSportDBApi
 import com.otto.paulus.favoritefootballmatchschedule.model.EventResponse
 import com.otto.paulus.favoritefootballmatchschedule.view.MatchListView
+import com.otto.paulus.favoritefootballmatchschedule.db.database
 import org.jetbrains.anko.AnkoLogger
 import org.jetbrains.anko.doAsync
 import org.jetbrains.anko.uiThread
